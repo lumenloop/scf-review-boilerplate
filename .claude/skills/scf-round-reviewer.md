@@ -70,7 +70,7 @@ Before doing anything else, determine which track this round is. This changes th
 
 | | Open Track | Integration Track | RFP Track |
 |---|---|---|---|
-| **What it funds** | New projects/protocols for Stellar | Integrations of Stellar building blocks into existing products | Specific deliverables requested by SDF |
+| **What it funds** | New projects/protocols for Stellar | Integrations of Stellar building blocks into existing products | Specific deliverables requested via SCF RFPs (listed in handbook) |
 | **Top priority** | Ecosystem Impact | Integration Partner Fit | Spec Compliance with the RFP |
 | **Unique dimensions** | Differentiation | End-User Value | Developer Experience, Maintenance Plan |
 | **Key question** | "Does Stellar need this?" | "Does this bring Stellar to real users?" | "Does this deliver what the RFP asked for?" |
@@ -83,7 +83,7 @@ Before doing anything else, determine which track this round is. This changes th
 
 **This phase is CRITICAL for RFP Track reviews.** Skip it for Open and Integration Track.
 
-The whole point of RFP Track is that SDF published specific requirements and teams are proposing to deliver them. You MUST fetch and understand those requirements before reviewing any submissions.
+The whole point of RFP Track is that the SCF published specific requirements and teams are proposing to deliver them. You MUST fetch and understand those requirements before reviewing any submissions.
 
 ### Step 0.5.1: Find the RFP Spec
 
@@ -98,12 +98,12 @@ Fetch the RFP page using WebFetch. If the main page doesn't have the full spec, 
 
 For each RFP category found in the CSV, extract:
 - **Title** — What the RFP is called
-- **Problem statement** — What SDF wants solved
+- **Problem statement** — What the RFP wants solved
 - **Required deliverables** — What must be built (this is the spec)
 - **Nice-to-have deliverables** — What's bonus
 - **Technical constraints** — Any specific technical requirements (e.g., "must use Soroban", "must support SEP-24")
 - **Success criteria** — How SDF will judge completion
-- **Budget guidance** — If SDF specified a budget range
+- **Budget guidance** — If the RFP specified a budget range
 
 ### Step 0.5.3: Write RFP Spec Summary
 

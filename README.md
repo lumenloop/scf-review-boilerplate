@@ -29,7 +29,7 @@ Claude reads `CLAUDE.md`, auto-detects CSV columns, loads the skills from `.clau
 |---|---|---|
 | **Open Track** | New projects/protocols for Stellar | Ecosystem Impact |
 | **Integration Track** | Stellar building block integrations into existing products | Integration Partner Fit |
-| **RFP Track** | Proposals responding to specific SDF requests | Spec Compliance (fetches the RFP spec and checks against it) |
+| **RFP Track** | Proposals responding to specific SCF requests (listed in handbook) | Spec Compliance (fetches the RFP spec and checks against it) |
 
 ## What It Does
 
