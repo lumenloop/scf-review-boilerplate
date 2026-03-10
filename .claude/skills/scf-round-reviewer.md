@@ -87,12 +87,13 @@ The whole point of RFP Track is that the SCF published specific requirements and
 
 ### Step 0.5.1: Find the RFP Spec
 
-The RFP specifications are published on the SCF website. Look for them at:
-- `https://communityfund.stellar.org/rfps` — List of active and past RFPs
+The RFP specifications are published in the SCF Handbook. Look for them at:
+- `https://stellar.gitbook.io/scf-handbook/scf-awards/build-award/rfp-track` — Primary source for all RFP specs
+- `https://communityfund.stellar.org/rfps` — Fallback (may redirect or 404 depending on site changes)
 - The `Round` column in the CSV tells you which round this is
 - The `track_specifics` column may name the specific RFP category (e.g., "C-Address Tooling & Onboarding")
 
-Fetch the RFP page using WebFetch. If the main page doesn't have the full spec, follow links to individual RFP detail pages.
+Fetch the gitbook RFP page using WebFetch. If that fails, try the communityfund.stellar.org URL. If the main page doesn't have the full spec, follow links to individual RFP detail pages.
 
 ### Step 0.5.2: Extract RFP Requirements
 
@@ -187,6 +188,7 @@ Flag these before review starts:
 - Submissions with referrals (for later referral adjustment)
 - Any submissions with unusual status values
 - For RFP Track: submissions that seem to target a different RFP than expected
+- **Multi-RFP submissions**: If a submission's `track_specifics` field contains multiple RFP categories (comma-separated), flag it in the master index. These submissions should be reviewed once with their primary RFP batch, scored against the RFP where they have the strongest alignment, and the review should note coverage (or lack thereof) of secondary RFPs. Report multi-RFP submissions as a finding in the final ranking — the panel needs to decide how to evaluate scope breadth vs. depth.
 
 ---
 
@@ -208,6 +210,10 @@ IMPORTANT: Tell each agent to:
 - If a WebFetch hangs, mark it UNVERIFIED and move on
 - Fetch architecture docs from the technical architecture column
 - Use the correct track-specific scoring dimensions (see below)
+- **Read `.claude/skills/fetch-external-doc.md`** before starting reviews — it contains critical URL resolution instructions for Google Docs, Google Drive PDFs, GitHub, Notion, and IPFS links
+- For Google Docs URLs: use the `read-gdoc` skill if available, otherwise transform to export URL (`https://docs.google.com/document/d/{ID}/export?format=txt`) before fetching
+- For Google Drive PDF URLs: extract the file ID and use `https://drive.google.com/uc?export=download&id={ID}`
+- For GitHub file URLs: convert to raw URL (`raw.githubusercontent.com`) before fetching
 
 ### Per-Submission Review Process
 
@@ -322,7 +328,12 @@ Write to `reviews/{slug}.md`. Each review file follows this structure:
 
 **Header table** with columns Field and Value, containing: Project, Budget, Category, Track, Referrer (or "None").
 
-**For RFP Track only — Spec Compliance Checklist** (`## RFP Compliance`): The filled-out checklist from `00-rfp-spec.md` showing which requirements are met, partially met, or not addressed. This comes BEFORE the prescreen.
+**For RFP Track only — Spec Compliance Checklist** (`## RFP Compliance`): Use checkbox format for EVERY item from the RFP spec checklist in `00-rfp-spec.md`. Format:
+- `- [x] {requirement} — {brief evidence}` for MET
+- `- [ ] {requirement} — PARTIALLY MET: {what's missing}` for partial
+- `- [ ] {requirement} — NOT ADDRESSED` for missing
+
+Group into "Required Deliverables", "Must-Build Components", and "Nice-to-Have" subsections matching the RFP spec structure. This comes BEFORE the prescreen.
 
 **Prescreen section** (`## Prescreen`): Table with columns Check, Result, Notes. For RFP Track, includes the extra "RFP Alignment" check.
 
@@ -330,7 +341,7 @@ Write to `reviews/{slug}.md`. Each review file follows this structure:
 
 **Scoring section** (`## Scoring`): Subsections for each dimension (track-specific). Each subsection title includes the raw score and weighted value. Body is 2-4 sentences of specific evidence.
 
-**Composite Score section** (`## Composite Score`): Summary table with columns Dimension, Raw, Weight, Weighted — plus TOTAL row. Normalized score out of 100.
+**Composite Score section** (`## Composite Score`): Summary table with columns Dimension, Raw, Weight, Weighted — plus TOTAL row. Then a single normalized score line formatted exactly as: `**Normalized Score**: {number} / 100` — do NOT include the formula, just the final number.
 
 **Recommendation section** (`## Recommendation: FUND / FUND WITH CONDITIONS / DO NOT FUND`): 2-3 sentence summary.
 
