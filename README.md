@@ -55,7 +55,7 @@ Claude reads `CLAUDE.md`, auto-detects CSV columns, loads the skills from `.clau
 - Track/category info
 - Status and round identifier
 
-See `data/example-round.csv` for a real example. Claude will write the detected column mapping to `reviews/00-column-mapping.md` so you can verify it.
+Claude will write the detected column mapping to `reviews/00-column-mapping.md` so you can verify it.
 
 ## Output
 
