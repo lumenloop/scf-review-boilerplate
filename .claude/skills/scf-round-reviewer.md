@@ -192,6 +192,70 @@ Flag these before review starts:
 
 ---
 
+## Phase 1.7: Pre-Fetch External Documents
+
+**Executor**: Leader agent (you)
+
+Before spawning review agents, fetch ALL external documents centrally. Agents fetching Google Docs/Drive independently is unreliable — they often fail silently or skip the `read-gdoc` skill. Pre-fetching ensures every agent has access to the full content.
+
+### Step 1.7.1: Extract All URLs
+
+Scan these columns for every submission:
+- `technical_architecture` (highest priority — often contains the detailed arch doc)
+- `video` (record but don't fetch video content)
+- `description`, `traction`, `products_services` (scan for inline URLs)
+
+### Step 1.7.2: Fetch Documents
+
+For each URL, follow the resolution rules from `.claude/skills/fetch-external-doc.md`:
+
+| URL Type | How to Fetch |
+|---|---|
+| **Google Docs** (`docs.google.com/document/d/{ID}/...`) | Use the `read-gdoc` skill: `Skill: read-gdoc, Args: {url}`. If unavailable, transform to `https://docs.google.com/document/d/{ID}/export?format=txt` and WebFetch. |
+| **Google Drive PDFs** (`drive.google.com/file/d/{ID}/...`) | Use the `read-gdoc` skill. If unavailable, use `https://drive.google.com/uc?export=download&id={ID}`. |
+| **GitHub files** (`github.com/{owner}/{repo}/blob/{branch}/{path}`) | Convert to `https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}` and WebFetch. |
+| **GitHub repos** (`github.com/{owner}/{repo}`) | WebFetch the repo page for README content. |
+| **Notion pages** | WebFetch directly. |
+| **Unfetchable** (DocSend, Excalidraw, Figma, Loom, Miro) | Mark as UNFETCHABLE. |
+
+**Rules:**
+- Timeout: skip after 15 seconds and mark UNVERIFIED
+- If a Google Doc/Drive fetch fails, **retry once** with the alternate method (export URL if `read-gdoc` failed, or vice versa)
+- If it still fails, mark UNVERIFIED with the reason
+
+### Step 1.7.3: Write External Docs Cache
+
+Write `reviews/00-external-docs.md` with the fetched content:
+
+```markdown
+# External Documents Cache — SCF #{round}
+
+## {project-slug}
+
+### Source: {original URL}
+**Status**: ACCESSIBLE | UNVERIFIED | UNFETCHABLE
+**Type**: Google Doc | Google Drive PDF | GitHub | Notion | Other
+
+{fetched content, or reason for failure}
+
+---
+```
+
+This file is the **single source of truth** for external document content. Review agents read from this file instead of fetching URLs themselves.
+
+### Step 1.7.4: Verify Coverage
+
+Log a summary:
+- Total URLs found: {n}
+- Successfully fetched: {n}
+- UNVERIFIED (fetch failed): {n}
+- UNFETCHABLE (unsupported platform): {n}
+- No external doc: {n} submissions
+
+If more than 30% of architecture docs are UNVERIFIED, pause and ask the user if they want to investigate before proceeding.
+
+---
+
 ## Phase 2+3: Parallel Review
 
 **Executor**: Parallel agents (one per batch), created via TeamCreate
@@ -203,17 +267,14 @@ Create a team and spawn one agent per batch. Each agent receives:
 - The **track** (Open / Integration / RFP) and corresponding scoring dimensions
 - The category and budget benchmark for their submissions
 - For RFP Track: the RFP spec and compliance checklist from `reviews/00-rfp-spec.md`
+- The path to `reviews/00-external-docs.md` — pre-fetched architecture docs and external content
 
 IMPORTANT: Tell each agent to:
 - Use SLUG filenames for output files
 - Read submission data from the CSV using the auto-detected column mapping
 - If a WebFetch hangs, mark it UNVERIFIED and move on
-- Fetch architecture docs from the technical architecture column
+- **Read external docs from `reviews/00-external-docs.md`** — do NOT re-fetch Google Docs/Drive URLs yourself. The leader agent pre-fetched these. Only fetch URLs not in the cache (e.g., inline links found during review).
 - Use the correct track-specific scoring dimensions (see below)
-- **Read `.claude/skills/fetch-external-doc.md`** before starting reviews — it contains critical URL resolution instructions for Google Docs, Google Drive PDFs, GitHub, Notion, and IPFS links
-- For Google Docs URLs: use the `read-gdoc` skill if available, otherwise transform to export URL (`https://docs.google.com/document/d/{ID}/export?format=txt`) before fetching
-- For Google Drive PDF URLs: extract the file ID and use `https://drive.google.com/uc?export=download&id={ID}`
-- For GitHub file URLs: convert to raw URL (`raw.githubusercontent.com`) before fetching
 
 ### Per-Submission Review Process
 
@@ -244,7 +305,9 @@ Prescreen result:
 - LIKELY FAIL: Any FAIL
 
 #### Step C: Link Verification
-Fetch the technical architecture URL, video URL, and any URLs found in description, traction, or products & services fields.
+Check the technical architecture URL, video URL, and any URLs found in description, traction, or products & services fields.
+
+**For architecture docs**: Look up the project slug in `reviews/00-external-docs.md` first. The leader agent already pre-fetched these. Use the cached content for your review — do NOT re-fetch Google Docs/Drive URLs. Only fetch URLs that aren't in the cache (e.g., new inline links you discover).
 
 For each URL, record:
 - Status: ACCESSIBLE or UNVERIFIED

@@ -76,10 +76,10 @@ reviews/
   00-column-mapping.md  # Auto-detected CSV column mapping
   00-master-index.md    # Summary stats, categories, batches
   00-rfp-spec.md        # (RFP Track only) Extracted RFP requirements
+  00-external-docs.md   # Pre-fetched Google Docs, Drive PDFs, GitHub content
   01-ranking.md         # Final ranked list with recommendations
   results.csv           # Machine-readable results (importable to Airtable)
-  calibration-top-bottom.md
-  calibration-middle.md
+  calibration-notes.md  # Cross-batch calibration findings
   {project-slug}.md     # Individual review per submission
 ```
 
