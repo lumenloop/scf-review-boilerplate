@@ -273,7 +273,7 @@ IMPORTANT: Tell each agent to:
 - Use SLUG filenames for output files
 - Read submission data from the CSV using the auto-detected column mapping
 - If a WebFetch hangs, mark it UNVERIFIED and move on
-- **Read external docs from `reviews/00-external-docs.md`** — do NOT re-fetch Google Docs/Drive URLs yourself. The leader agent pre-fetched these. Only fetch URLs not in the cache (e.g., inline links found during review).
+- **Read external docs from `reviews/00-external-docs.md`** — the leader agent already pre-fetched architecture docs (Google Docs, Drive PDFs, GitHub files, Notion pages, etc.). Check the cache first for any URL before fetching it yourself. Only fetch URLs that aren't in the cache (e.g., inline links discovered during review).
 - Use the correct track-specific scoring dimensions (see below)
 
 ### Per-Submission Review Process
@@ -307,7 +307,7 @@ Prescreen result:
 #### Step C: Link Verification
 Check the technical architecture URL, video URL, and any URLs found in description, traction, or products & services fields.
 
-**For architecture docs**: Look up the project slug in `reviews/00-external-docs.md` first. The leader agent already pre-fetched these. Use the cached content for your review — do NOT re-fetch Google Docs/Drive URLs. Only fetch URLs that aren't in the cache (e.g., new inline links you discover).
+**For architecture docs and other external links**: Look up the project slug in `reviews/00-external-docs.md` first — the leader agent already pre-fetched Google Docs, Drive PDFs, GitHub files, Notion pages, and other external content. Use the cached content for your review. Only fetch URLs that aren't in the cache (e.g., new inline links you discover during review).
 
 For each URL, record:
 - Status: ACCESSIBLE or UNVERIFIED
