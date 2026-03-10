@@ -2,6 +2,16 @@
 
 An open-source, turnkey review kit for [Stellar Community Fund](https://communityfund.stellar.org/) rounds. Drop a CSV export from Airtable, point Claude at this repo, and it reviews every submission using a team of parallel agents.
 
+## Try It
+
+Drop your CSV in `data/`, then tell Claude:
+
+```
+Use https://github.com/lumenloop/scf-review-boilerplate and review RFP #41
+```
+
+That's it. Claude clones the repo, reads the CSV, fetches RFP specs, spawns parallel review agents, and produces ranked reviews for every submission.
+
 ## Quick Start
 
 ```bash
