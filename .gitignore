@@ -2,7 +2,7 @@
 data/*.csv
 
 # Review outputs
-reviews/*.md
+reviews/*
 !reviews/.gitkeep
 
 # Environment
