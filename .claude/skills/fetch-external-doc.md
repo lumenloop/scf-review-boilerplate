@@ -82,9 +82,9 @@ When you encounter a URL in a submission (especially in the Technical Architectu
 - `notion.so/{PAGE_ID}`
 
 **How to fetch:**
-- Use WebFetch directly on the URL
-- Most public Notion pages render accessible HTML
-- If it hangs after 15 seconds, mark UNVERIFIED
+- Notion pages are client-side rendered (JavaScript) — WebFetch returns only the loading shell, not the actual content
+- Mark as UNFETCHABLE with note: "Notion page — requires JavaScript rendering, content not accessible via WebFetch"
+- If the submission relies heavily on a Notion doc for its architecture, note this as a gap in the review — the reviewer could not access the full technical detail
 
 ### IPFS Links
 
@@ -102,11 +102,13 @@ When you encounter a URL in a submission (especially in the Technical Architectu
 ### Unfetchable URLs
 
 These services cannot be reliably fetched — mark as UNFETCHABLE:
+- **Notion** (`notion.site/...`, `notion.so/...`) — client-side JS rendering, WebFetch returns empty shell
 - **DocSend** (`docsend.com/...`) — requires email/login
 - **Excalidraw** (`excalidraw.com/...`) — renders as canvas, no text
 - **Figma** (`figma.com/...`) — requires authentication
 - **Loom** (`loom.com/...`) — video, no text extraction
 - **Miro** (`miro.com/...`) — requires authentication
+- **Whimsical** (`whimsical.com/...`) — visual diagrams, no text extraction
 
 ## Fetch Strategy
 
