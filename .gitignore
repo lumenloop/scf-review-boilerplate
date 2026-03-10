@@ -1,6 +1,5 @@
 # Data files (users add their own CSV)
 data/*.csv
-!data/example-round.csv
 
 # Review outputs
 reviews/*.md
