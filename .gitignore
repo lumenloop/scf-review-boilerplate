@@ -1,9 +1,12 @@
 # Data files (users add their own CSV)
 data/*.csv
 
-# Review outputs
-reviews/*
+# Review outputs (any reviews* folder)
+reviews*/
 !reviews/.gitkeep
+
+# Claude local project memory
+.claude/projects/
 
 # Environment
 .env
