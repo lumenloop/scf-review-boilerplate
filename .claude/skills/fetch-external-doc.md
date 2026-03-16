@@ -142,14 +142,14 @@ When processing a submission's links:
 
 ## Using the `read-gdoc` Skill
 
-If the `read-gdoc` skill is available in your environment (check with the Skill tool), prefer using it for Google Docs and Google Drive files — it handles the URL transformation automatically:
+The `read-gdoc` skill uses `curl -sL` under the hood — which is the correct approach. You can invoke it via the Skill tool:
 
 ```
 Skill: read-gdoc
 Args: https://docs.google.com/document/d/{DOC_ID}/edit
 ```
 
-If `read-gdoc` is not available, use the manual URL transformation described above with WebFetch.
+For bulk fetching (e.g., Phase 1.7 pre-fetch), use `curl -sL` directly in a Python/Bash loop instead of invoking the skill per-doc — it's faster and more reliable for batch operations.
 
 ## Common Issues
 

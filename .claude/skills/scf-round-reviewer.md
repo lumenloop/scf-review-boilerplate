@@ -42,13 +42,13 @@ The technical architecture column often contains URLs to detailed docs (Google D
 
 **Follow the `fetch-external-doc` skill (`.claude/skills/fetch-external-doc.md`) for full URL resolution instructions.** Key points:
 
-- **Google Docs** (`docs.google.com/document/d/{ID}/...`): Transform to export URL `https://docs.google.com/document/d/{ID}/export?format=txt` and fetch with WebFetch. Or use the `read-gdoc` skill if available.
-- **Google Drive PDFs** (`drive.google.com/file/d/{ID}/...`): Transform to `https://drive.google.com/uc?export=download&id={ID}` and fetch with WebFetch. Or use `read-gdoc`.
-- **Google Drive alternate formats** (`drive.google.com/open?id={ID}`): Extract the ID, same download URL as above.
-- **GitHub files** (`github.com/{owner}/{repo}/blob/{branch}/{path}`): Convert to raw URL `https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}`.
-- **Notion pages**: WebFetch directly.
+- **Google Docs** (`docs.google.com/document/d/{ID}/...`): **MUST use `curl -sL`**: `curl -sL "https://docs.google.com/document/d/{ID}/export?format=txt" -o /tmp/gdoc_{slug}.txt`. Do NOT use WebFetch.
+- **Google Drive PDFs** (`drive.google.com/file/d/{ID}/...`): **MUST use `curl -sL`**: `curl -sL "https://drive.usercontent.google.com/download?id={ID}&export=download" -o /tmp/gdrive_{slug}.pdf`. Do NOT use WebFetch.
+- **Google Drive alternate formats** (`drive.google.com/open?id={ID}`): Extract the ID, same `curl` approach as above.
+- **GitHub files** (`github.com/{owner}/{repo}/blob/{branch}/{path}`): Convert to raw URL `https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}` and WebFetch.
+- **Notion pages**: Mark as UNFETCHABLE (client-side JS rendering).
 - **IPFS**: WebFetch via `https://ipfs.io/ipfs/{HASH}`. Skip after 15 seconds.
-- **Unfetchable** (DocSend, Excalidraw, Figma): Mark as UNFETCHABLE.
+- **Unfetchable** (DocSend, Excalidraw, Figma, Loom, Miro, Whimsical): Mark as UNFETCHABLE.
 
 **IMPORTANT**: When spawning review agents, include the full fetch-external-doc instructions in their prompt so they know how to resolve URLs. Agents won't have access to skill files unless you pass the content to them.
 
@@ -291,7 +291,7 @@ Parse the row for this submission using the auto-detected column mapping.
 
 | Check | What to Evaluate | Rating |
 |---|---|---|
-| Completeness | All key fields populated? Team description present? Budget provided? Tranches with deliverables? | PASS / FLAG / FAIL |
+| Completeness | All key fields populated? Team description present? Budget provided? Tranches with **concrete, verifiable deliverables** (not just business outcomes like "$1M volume" or "2 clients live")? Per-tranche or per-deliverable **budget breakdown** present? | PASS / FLAG / FAIL |
 | Stellar Integration | Is Stellar genuinely central (not bolted-on)? Soroban, Horizon, SEPs? Could this work on any chain? | PASS / FLAG / FAIL |
 | Eligibility | Budget within $150K limit? Appropriate status? | PASS / FLAG / FAIL |
 | Quality Threshold | Professional writing? Coherent technical approach? Realistic timelines? | PASS / FLAG / FAIL |
@@ -334,7 +334,7 @@ Use the scoring dimensions for the detected track:
 | Technical Depth (x2) | HIGH | 5: Novel architecture, Soroban-native, formal verification. 4: Detailed contract design, deep Soroban understanding. 3: Adequate. 2: Surface-level. 1: No substance. |
 | Differentiation (x2) | HIGH | 5: First-of-kind on Stellar AND cross-chain. 4: First on Stellar. 3: Some differentiation. 2: Crowded space. 1: Direct duplicate. |
 | Traction (x1.5) | MEDIUM | 5: Live product with on-chain metrics. 4: Working product. 3: Testnet/pilot. 2: Concept with LOIs. 1: Idea stage. |
-| Budget (x1.5) | MEDIUM | 5: Bottom-up, below benchmark, justified. 4: Detailed, at benchmark. 3: Adequate. 2: Vague, above benchmark. 1: No breakdown. |
+| Budget (x1.5) | MEDIUM | 5: Bottom-up per-deliverable breakdown, below benchmark, justified. 4: Detailed per-tranche breakdown, at benchmark. 3: Adequate with some breakdown. 2: No per-deliverable breakdown OR vague OR above benchmark. 1: No breakdown at all. **A low total alone does NOT justify a high score — "cheap" is not "well-justified."** |
 | Community Readiness (x1.5) | MEDIUM | 5: Deep Stellar history, prior SCF delivery. 4: Proven blockchain team. 3: Credible. 2: Thin credentials. 1: Unverifiable. |
 
 **Composite**: `weighted / 57.5 * 100`
@@ -347,7 +347,7 @@ Use the scoring dimensions for the detected track:
 | End-User Value (x2.5) | HIGH | 5: Puts Stellar in hands of millions of real users. 4: Significant user reach with clear UX. 3: Moderate reach. 2: Niche audience or unclear UX path. 1: No clear end-user benefit. |
 | Traction (x2) | HIGH | 5: Live product with significant existing users/volume. 4: Working product with verified users. 3: Pilot or beta. 2: LOIs only. 1: Idea stage. |
 | Technical Architecture (x1.5) | MEDIUM | 5: Elegant integration, correct SDK/API usage, security model. 4: Sound design. 3: Adequate. 2: Superficial. 1: No technical detail. |
-| Budget (x1.5) | MEDIUM | 5: Proportional to integration scope, well-justified. 4: Reasonable. 3: Adequate. 2: Inflated. 1: No justification. |
+| Budget (x1.5) | MEDIUM | 5: Per-deliverable breakdown, proportional to scope, well-justified. 4: Per-tranche breakdown, reasonable. 3: Adequate with some breakdown. 2: No per-deliverable breakdown OR inflated. 1: No justification. **A low total alone does NOT justify a high score — "cheap" is not "well-justified."** |
 | Ecosystem Commitment (x1) | LOWER | 5: Deep Stellar commitment, maintenance plan, open source. 4: Clear commitment. 3: Some commitment signals. 2: Possible chain-hopper. 1: No Stellar commitment evident. |
 
 **Composite**: `weighted / 57.5 * 100`
@@ -361,7 +361,7 @@ Use the scoring dimensions for the detected track:
 | Developer Experience (x2) | HIGH | 5: Exceptional DX plan — setup ease, comprehensive docs, clear error messages, SDK examples. 4: Good DX plan. 3: Adequate. 2: DX is an afterthought. 1: No DX consideration. |
 | Maintenance Plan (x1.5) | MEDIUM | 5: Detailed during-grant AND post-grant maintenance, SLAs, monitoring, update plan. 4: Clear maintenance commitments. 3: Some maintenance mentioned. 2: Vague. 1: No maintenance plan. |
 | Technical Approach (x1.5) | MEDIUM | 5: Elegant architecture, appropriate tech choices, security model. 4: Sound approach. 3: Adequate. 2: Questionable choices. 1: No technical detail. |
-| Budget & Timeline (x1) | LOWER | 5: Realistic timeline front-loaded with hard work, budget justified per deliverable. 4: Reasonable. 3: Adequate. 2: Unrealistic or inflated. 1: No justification. |
+| Budget & Timeline (x1) | LOWER | 5: Realistic timeline front-loaded with hard work, budget justified per deliverable with line items. 4: Per-tranche breakdown, reasonable timeline. 3: Adequate with some breakdown. 2: Unrealistic OR inflated OR no per-deliverable breakdown. 1: No justification. **A low total alone does NOT justify a high score.** |
 
 **Composite**: `weighted / 57.5 * 100`
 
