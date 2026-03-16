@@ -19,6 +19,15 @@ git clone https://github.com/lumenloop/scf-review-boilerplate
 cd scf-review-boilerplate
 ```
 
+### 1. Install Required External Skills
+
+These provide Stellar and smart contract domain knowledge essential for accurate technical evaluation. Follow each repo's installation instructions:
+
+- **[stellar/stellar-dev-skill](https://github.com/stellar/stellar-dev-skill)** — Soroban, RPC, Horizon, SEPs, Smart Accounts, ecosystem protocols
+- **[OpenZeppelin/openzeppelin-skills](https://github.com/OpenZeppelin/openzeppelin-skills)** — Smart contract security patterns, Stellar contract setup/upgrades
+
+### 2. Add Your CSV and Run
+
 1. Export your round's submissions from Airtable as CSV
 2. Place the CSV in `data/` (e.g. `data/submissions.csv`)
 3. Open Claude Code in this directory:

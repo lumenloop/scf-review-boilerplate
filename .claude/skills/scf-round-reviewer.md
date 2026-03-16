@@ -11,6 +11,22 @@ Step-by-step instructions to independently review and rank all submissions to an
 
 ## Prerequisites
 
+### External Skills (MUST be installed before running)
+
+These provide domain-specific knowledge that significantly affects scoring quality. **Verify they are installed before starting any review round.**
+
+1. **Stellar Dev Skill** (`stellar/stellar-dev-skill`) — Soroban SDK, Stellar RPC, Horizon, SEPs, Smart Accounts, ecosystem protocols. Use this knowledge when evaluating:
+   - Technical Depth / Technical Architecture: Is the submission using Soroban correctly? Are SEP references accurate? Is the RPC vs Horizon choice appropriate?
+   - Stellar Integration prescreen: Is Stellar genuinely central or bolted-on?
+   - Competitive analysis: What already exists in the Stellar ecosystem?
+
+2. **OpenZeppelin Skills** (`OpenZeppelin/openzeppelin-skills`) — Smart contract security patterns, Stellar contract setup/upgrades. Use this knowledge when evaluating:
+   - Smart contract architecture: Are contracts following security best practices?
+   - RFP Track: The C-Address Tooling RFP specifically requires OpenZeppelin Smart Account standard integration
+   - Budget reasonableness: Is the contract complexity consistent with the budget and timeline?
+
+If either skill is missing, warn the user and recommend installing before proceeding. See CLAUDE.md for installation instructions.
+
 ### Files Required
 - A CSV file in `data/` exported from the Airtable submissions table
 - Review skill definitions in `.claude/skills/`:
