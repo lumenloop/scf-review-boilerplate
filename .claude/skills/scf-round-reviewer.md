@@ -211,17 +211,21 @@ For each URL, follow the resolution rules from `.claude/skills/fetch-external-do
 
 | URL Type | How to Fetch |
 |---|---|
-| **Google Docs** (`docs.google.com/document/d/{ID}/...`) | Use the `read-gdoc` skill: `Skill: read-gdoc, Args: {url}`. If unavailable, transform to `https://docs.google.com/document/d/{ID}/export?format=txt` and WebFetch. |
-| **Google Drive PDFs** (`drive.google.com/file/d/{ID}/...`) | Use the `read-gdoc` skill. If unavailable, use `https://drive.google.com/uc?export=download&id={ID}`. |
+| **Google Docs** (`docs.google.com/document/d/{ID}/...`) | **MUST use `curl -sL`** via Bash: `curl -sL "https://docs.google.com/document/d/{ID}/export?format=txt" -o /tmp/gdoc_{slug}.txt` then Read the file. Do NOT use WebFetch — it cannot follow Google's redirect chain. |
+| **Google Drive PDFs** (`drive.google.com/file/d/{ID}/...`) | **MUST use `curl -sL`** via Bash: `curl -sL "https://drive.usercontent.google.com/download?id={ID}&export=download" -o /tmp/gdrive_{slug}.pdf` then Read the file. Do NOT use WebFetch. |
 | **GitHub files** (`github.com/{owner}/{repo}/blob/{branch}/{path}`) | Convert to `https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}` and WebFetch. |
 | **GitHub repos** (`github.com/{owner}/{repo}`) | WebFetch the repo page for README content. |
-| **Notion pages** | WebFetch directly. |
-| **Unfetchable** (DocSend, Excalidraw, Figma, Loom, Miro) | Mark as UNFETCHABLE. |
+| **Notion pages** | Mark as UNFETCHABLE (client-side JS rendering, WebFetch returns empty shell). |
+| **Unfetchable** (DocSend, Excalidraw, Figma, Loom, Miro, Whimsical) | Mark as UNFETCHABLE. |
+
+**CRITICAL**: For Google Docs and Google Drive files, you MUST use `curl -sL` (via the Bash tool), NOT WebFetch. WebFetch cannot handle Google's redirect chain and will fail silently on nearly all shared docs. The `curl -sL` approach works reliably (~98% success rate on publicly shared docs).
+
+**Batch fetching tip**: For efficiency, write a Python script that loops through all Google Docs/Drive URLs and fetches them all with `subprocess.run(['curl', '-sL', '--max-time', '20', url, '-o', outfile])`.
 
 **Rules:**
-- Timeout: skip after 15 seconds and mark UNVERIFIED
-- If a Google Doc/Drive fetch fails, **retry once** with the alternate method (export URL if `read-gdoc` failed, or vice versa)
-- If it still fails, mark UNVERIFIED with the reason
+- Timeout: `--max-time 20` on curl, skip and mark UNVERIFIED if it fails
+- If a Google Doc/Drive fetch returns an HTML error page (check for `<html` + `sign in`), mark UNVERIFIED
+- Cap content at 5000 chars per document in the cache file to keep it manageable
 
 ### Step 1.7.3: Write External Docs Cache
 

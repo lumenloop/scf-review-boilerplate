@@ -20,15 +20,22 @@ When you encounter a URL in a submission (especially in the Technical Architectu
 - `docs.google.com/document/d/{DOC_ID}/edit`
 - `docs.google.com/document/d/{DOC_ID}/view`
 
-**How to fetch:**
-1. Extract the `{DOC_ID}` from the URL
+**How to fetch — MUST use `curl`, not WebFetch:**
+1. Extract the `{DOC_ID}` from the URL (the long alphanumeric string after `/document/d/`)
 2. Construct the export URL: `https://docs.google.com/document/d/{DOC_ID}/export?format=txt`
-3. Fetch using WebFetch with the export URL
-4. If that fails, try: `https://docs.google.com/document/d/{DOC_ID}/pub`
+3. Fetch using `curl -sL` via the Bash tool:
+   ```bash
+   curl -sL "https://docs.google.com/document/d/{DOC_ID}/export?format=txt" -o /tmp/gdoc_{slug}.txt
+   ```
+4. Read the downloaded file with the Read tool
+5. If that fails, try: `https://docs.google.com/document/d/{DOC_ID}/pub`
+
+**IMPORTANT**: Do NOT use WebFetch for Google Docs — it cannot follow Google's redirect chain. `curl -sL` handles this correctly and reliably fetches publicly shared docs.
 
 **Example:**
 - Input: `https://docs.google.com/document/d/1aBcDeFgHiJkLmNoPqRsTuVwXyZ/edit?usp=sharing`
 - Export URL: `https://docs.google.com/document/d/1aBcDeFgHiJkLmNoPqRsTuVwXyZ/export?format=txt`
+- Command: `curl -sL "https://docs.google.com/document/d/1aBcDeFgHiJkLmNoPqRsTuVwXyZ/export?format=txt" -o /tmp/gdoc_myproject.txt`
 
 ### Google Drive Files (PDFs, etc.)
 
@@ -38,16 +45,22 @@ When you encounter a URL in a submission (especially in the Technical Architectu
 - `drive.google.com/open?id={FILE_ID}`
 - `drive.google.com/uc?id={FILE_ID}`
 
-**How to fetch:**
+**How to fetch — MUST use `curl`, not WebFetch:**
 1. Extract the `{FILE_ID}` from the URL
-2. Construct the direct download URL: `https://drive.google.com/uc?export=download&id={FILE_ID}`
-3. Fetch using WebFetch
-4. If the file is a PDF, WebFetch may not render it well — note this in the review and extract what you can
-5. Alternative: try `https://drive.google.com/uc?id={FILE_ID}&export=download`
+2. Construct the download URL: `https://drive.usercontent.google.com/download?id={FILE_ID}&export=download`
+3. Fetch using `curl -sL` via the Bash tool:
+   ```bash
+   curl -sL "https://drive.usercontent.google.com/download?id={FILE_ID}&export=download" -o /tmp/gdrive_{slug}.pdf
+   ```
+4. Read the downloaded file with the Read tool
+5. If the file is a PDF, the Read tool can extract text from it
+
+**IMPORTANT**: Do NOT use WebFetch for Google Drive files — it cannot follow Google's redirect chain. `curl -sL` handles this correctly.
 
 **Example:**
 - Input: `https://drive.google.com/file/d/1xYzAbCdEfGhIjKlMnOpQrS/view?usp=sharing`
-- Download URL: `https://drive.google.com/uc?export=download&id=1xYzAbCdEfGhIjKlMnOpQrS`
+- Download URL: `https://drive.usercontent.google.com/download?id=1xYzAbCdEfGhIjKlMnOpQrS&export=download`
+- Command: `curl -sL "https://drive.usercontent.google.com/download?id=1xYzAbCdEfGhIjKlMnOpQrS&export=download" -o /tmp/gdrive_myproject.pdf`
 
 ### Google Drive Folders
 
