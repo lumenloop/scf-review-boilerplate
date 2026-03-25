@@ -9,6 +9,39 @@ description: "Review and rank an entire SCF round end-to-end from a CSV export. 
 
 Step-by-step instructions to independently review and rank all submissions to an SCF round. The input is a CSV export from Airtable containing all submission data. Supports Open Track, Integration Track, and RFP Track — each with different scoring dimensions and priorities.
 
+## stellar-review CLI Integration (Optional)
+
+If `stellar-review` is installed (`npm install -g stellar-review-cli`), use it for data I/O — it handles CSV parsing, column detection, state tracking, and scoring math, so you can focus on evaluation. If the CLI is not available, fall back to the manual CSV parsing instructions below.
+
+### With stellar-review (preferred)
+
+```bash
+# Phase 1: Import
+stellar-review import data/<csv-file> --template scf-rfp --round <N>
+stellar-review fetch
+
+# Read data for review
+stellar-review show <slug> --json --docs
+stellar-review list projects --json
+
+# Save evaluations
+stellar-review save-eval <slug> --scores '[...]' --recommendation FUND --content-file /tmp/review.md
+
+# Phase 4-5: Calibrate and rank
+stellar-review calibrate --template scf-rfp
+stellar-review rank --template scf-rfp --format md --format csv
+
+# Compare submissions
+stellar-review compare <slug1> <slug2> --json
+
+# Ecosystem research
+stellar-review sources query ecosystem-db --category "DeFi" --json
+```
+
+When using the CLI, skip the "CSV Column Auto-Detection" and "Parsing the CSV" sections below — the CLI handles all of that. Jump to **Phase 0: Track Detection**.
+
+### Without stellar-review (standalone)
+
 ## Prerequisites
 
 ### External Skills (MUST be installed before running)
